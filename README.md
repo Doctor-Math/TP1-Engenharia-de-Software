@@ -6,10 +6,11 @@
 
 ## Membros da Equipe e Papéis
 
-*   [Nome do Membro 1]: [Papel (ex: full, backend, frontend)]
-*   [Nome do Membro 2]: [Papel]
-*   [Nome do Membro 3]: [Papel]
-    ...
+*   [Anny Caroline Almida Marcelino]: [Papel (ex: full, backend, frontend)]
+*   [Carolina Penido Barcellos]: [Papel]
+*   [Gabrielly Xavier dos Santos]: [Papel]
+*   [Matheus Soares dos Santos de Freitas]: [Papel]
+
 
 ## Pilha de Tecnologias
 
