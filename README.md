@@ -14,4 +14,19 @@
 
 ## Pilha de Tecnologias
 
-[Liste as tecnologias que serão utilizadas no projeto]
+### 💻 Ambiente
+- Google Colab
+
+### 🐍 Linguagem
+- Python 3
+
+### ⚙️ Hardware
+- CPU  
+- GPU (NVIDIA T4, disponível quando necessário)
+
+### 📚 Bibliotecas
+- Pandas  
+- NumPy  
+- Scikit-learn  
+- Seaborn  
+- Matplotlib  
