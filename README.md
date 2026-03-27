@@ -2,36 +2,40 @@
 
 ![Jupyter Notebook](https://img.shields.io/badge/Notebook-Jupyter-orange)
 
-## Objetivos e Principais Features
+## 🎯 Objetivos e Principais Features
+Este projeto se propõe a desenvolver um modelo de análise de risco para prever a probabilidade de inadimplência, auxiliando bancos e outras instituições financeiras na redução de perdas durante suas políticas de concessão de crédito a clientes. O foco central, portanto, é determinar a confiabilidade de usuários bancários por meio da identificação de padrões e fatores determinantes para o não pagamento de débitos.
+Nesse sentido, a principal hipótese investigada é se variáveis como altos níveis de endividamento, baixa renda e histórico negativo possuem correlação direta e estatisticamente relevante com o risco de calote por parte de usuários bancários. Assim, essa investigação busca gerar, como produto, a automatização da classificação de risco na concessão de crédito com base nos perfis dos clientes, proporcionando insights estratégicos para decisões mais assertivas e seguras por parte de agências do setor financeiro.
 
-O projeto tem como objetivo desenvolver um modelo de análise de crédito para prever a probabilidade de inadimplência de clientes, auxiliando instituições financeiras na tomada de decisão e redução de riscos. Para isso, utiliza-se a base [Credit Risk Analysis for extending Bank Loans](https://www.kaggle.com/datasets/atulmittal199174/credit-risk-analysis-for-extending-bank-loans), do Kaggle, com cerca de 1000 clientes e 9 variáveis, incluindo idade, nível de educação, experiência de trabalho, endereço, renda anual, índice de endividamento, relação crédito/renda, outras dívidas e histórico de inadimplência.
-O sistema envolve pré-processamento dos dados (tratamento de ausentes, normalização e EDA), seguido da aplicação de algoritmos de Machine Learning para classificação de risco. Também inclui engenharia de atributos, avaliação e comparação de modelos e visualização dos resultados.
-Outra demanda importante contemplada é a compreensão dos fatores que levam à inadimplência. Ou seja, além de classificar o cliente, o sistema também possibilita identificar quais características são mais frequentes entre os clientes que não pagam seus empréstimos, como altos níveis de endividamento, baixa renda ou histórico negativo. 
-Isso se alinha às demandas do mercado financeiro ao automatizar decisões, aumentar eficiência e gerar insights estratégicos para políticas de crédito mais assertivas.
+As principais features (variáveis) a serem exploradas são:
+- Dados socioeconômicos: Análise de como fatores como experiência profissional, escolaridade, renda anual, taxa de endividamento e a relação crédito/dívida impactam a probabilidade de calote.
+- Dados demográficos: Mensuração de como a geolocalização dos clientes se relaciona com o histórico de inadimplência e sua relevância para a classificação de riscos futuros.
+- Dados históricos: Verificação da importância do comportamento financeiro passado de cada cliente como preditor plausível de suas ações futuras.
 
-## Membros da Equipe e Papéis
+### 📊 Dataset Escolhido
+* **Origem:** [Credit Risk Analysis for extending Bank Loans](https://www.kaggle.com/datasets/atulmittal199174/credit-risk-analysis-for-extending-bank-loans)
+* **Tamanho:** 1.150 instâncias / 42,07kB
+* **Quantidade de Features:** 9 variáveis, incluindo dados socioeconômicos, demográficos e histórico financeiro.
 
-*   [Anny Caroline Almida Marcelino](https://github.com/AnnyACAM): Cientista de Dados / Machine Learning (modelagem e avaliação dos algoritmos)
-*   [Carolina Penido Barcellos](https://github.com/carolinabarcellos): Analista de Dados (visualização de dados e interpretação dos resultados)
-*   [Gabrielly Xavier dos Santos](https://github.com/gabyxsantos): Cientista de Dados (análise exploratória e pré-processamento dos dados)
-*   [Matheus Soares dos Santos de Freitas](https://github.com/Doctor-Math): Engenheiro de Dados (tratamento, organização e preparação do dataset)
+## 👥 Membros da Equipe e Papéis
+* **[Anny Caroline Almida Marcelino](https://github.com/AnnyACAM):** Cientista de Dados/ML (Modelagem e avaliação de algoritmos).
+* **[Carolina Penido Barcellos](https://github.com/carolinabarcellos):** Analista de Dados (Visualização e interpretação de resultados).
+* **[Gabrielly Xavier dos Santos](https://github.com/gabyxsantos):** Engenheira de Dados / Cientista de Dados (Análise exploratória e pré-processamento).
+* **[Matheus Soares dos Santos de Freitas](https://github.com/Doctor-Math):** Engenheiro de Dados / Cientista de Dados (Tratamento, organização e preparação do dataset).
 
+## 🛠️ Pilha de Tecnologias
 
-## Pilha de Tecnologias
+### 💻 Ambiente e Hardware
+- **Plataforma:** Google Colab
+- **Aceleração de Hardware:** CPU e GPU (NVIDIA T4) para processamento paralelo, conforme necessidade.
+- **Memória RAM:** Instância padrão de ~12GB.
 
-### 💻 Ambiente
-- Google Colab
+### 🐍 Linguagem e Dependências
+- **Linguagem:** Python 3.10.12
 
-### 🐍 Linguagem
-- Python 3
-
-### ⚙️ Hardware
-- CPU  
-- GPU (NVIDIA T4, disponível quando necessário)
-
-### 📚 Bibliotecas
-- Pandas  
-- NumPy  
-- Scikit-learn  
-- Seaborn  
-- Matplotlib  
+| Ferramenta | Versão | Função Principal |
+| :--- | :--- | :--- |
+| **Pandas** | 2.2.2 | Manipulação, limpeza e análise de dados estruturados. |
+| **NumPy** | 2.0.2 | Computação numérica e operações com arrays multidimensionais. |
+| **Scikit-learn** | 1.6.1 | Modelagem preditiva, pré-processamento e métricas de avaliação. |
+| **Matplotlib** | 3.10.0 | Geração de gráficos e customização de visualizações base. |
+| **Seaborn** | 0.13.2 | Interface de alto nível para gráficos estatísticos informativos. |
