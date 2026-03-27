@@ -12,15 +12,26 @@ As principais features (variáveis) a serem exploradas são:
 - Dados históricos: Verificação da importância do comportamento financeiro passado de cada cliente como preditor plausível de suas ações futuras.
 
 ### 📊 Dataset Escolhido
-* **Origem:** [Credit Risk Analysis for extending Bank Loans](https://www.kaggle.com/datasets/atulmittal199174/credit-risk-analysis-for-extending-bank-loans)
+* **Origem:** [Credit Risk Analysis for extending Bank Loans (Kaggle)](https://www.kaggle.com/datasets/atulmittal199174/credit-risk-analysis-for-extending-bank-loans)
 * **Tamanho:** 1.150 instâncias / 42,07kB
-* **Quantidade de Features:** 9 variáveis, incluindo dados socioeconômicos, demográficos e histórico financeiro.
+* **Quantidade de Features:** 9 variáveis, incluindo dados socioeconômicos, demográficos e histórico financeiro, a saber: *age* (idade), *ed* (escolaridade), *employ* (experiência profissional), *address* (endereço), *income* (renda), *debtinc* (índice de endividamento), *creddebt* (relação crédito/dívida), *othdebt* (outras dívidas) e *default* (variável binária, indicando se o cliente já foi inadimplente no passado).
 
 ## 👥 Membros da Equipe e Papéis
-* **[Anny Caroline Almida Marcelino](https://github.com/AnnyACAM):** Cientista de Dados/ML (Modelagem e avaliação de algoritmos).
-* **[Carolina Penido Barcellos](https://github.com/carolinabarcellos):** Analista de Dados (Visualização e interpretação de resultados).
-* **[Gabrielly Xavier dos Santos](https://github.com/gabyxsantos):** Engenheira de Dados / Cientista de Dados (Análise exploratória e pré-processamento).
-* **[Matheus Soares dos Santos de Freitas](https://github.com/Doctor-Math):** Engenheiro de Dados / Cientista de Dados (Tratamento, organização e preparação do dataset).
+* **[Anny Caroline Almida Marcelino](https://github.com/AnnyACAM)**
+  * **Papel:** *Machine Learning Engineer / Cientista de Dados*
+  * **Responsabilidades:** Lidera a inteligência preditiva. Responsável pela seleção de algoritmos, divisão de dados (treino/teste), ajuste de hiperparâmetros e validação do modelo através de métricas como Acurácia, F1-Score e AUC-ROC.
+
+* **[Carolina Penido Barcellos](https://github.com/carolinabarcellos)**
+  * **Papel:** *Analista de Dados / Data Storyteller*
+  * **Responsabilidades:** Atua na ponte entre dados e decisão. Responsável pela criação de visualizações críticas, interpretação estatística dos resultados e tradução dos outputs do modelo em insights estratégicos de negócio.
+
+* **[Gabrielly Xavier dos Santos](https://github.com/gabyxsantos)**
+  * **Papel:** *Cientista de Dados / Analista Exploratória*
+  * **Responsabilidades:** Focada na compreensão e preparação. Realiza a Análise Exploratória de Dados (EDA) para identificar correlações, trata *outliers* e conduz a Engenharia de Atributos (*Feature Engineering*).
+
+* **[Matheus Soares dos Santos de Freitas](https://github.com/Doctor-Math)**
+  * **Papel:** *Engenheiro de Dados / Arquiteto de Dados*
+  * **Responsabilidades:** Garante a infraestrutura e qualidade. Responsável pelo pipeline de limpeza, tratamento de valores nulos (NaN), garantia da tipagem correta e estruturação do dataset final para processamento.
 
 ## 🛠️ Pilha de Tecnologias
 
