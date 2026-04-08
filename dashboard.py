@@ -43,11 +43,16 @@ cred_min, cred_max = st.sidebar.slider(
     (float(dados['creddebt'].min()), float(dados['creddebt'].max()))
 )
 
-
 default_opcao = st.sidebar.selectbox(
-    'Default',
-    ['Todos', 0, 1]
+    'Clientes',
+    ['Todos', 'Confiáveis', 'Não confiáveis']
 )
+
+# Converter para valor numérico depois
+if default_opcao == 'Confiáveis':
+    valor = 0
+elif default_opcao == 'Não confiáveis':
+    valor = 1
 
 dados_filtrados = dados[
     (dados['age'] >= idade_min) & (dados['age'] <= idade_max) &
@@ -58,7 +63,7 @@ dados_filtrados = dados[
 ]
 
 if default_opcao != 'Todos':
-    dados_filtrados = dados_filtrados[dados_filtrados['default'] == default_opcao]
+    dados_filtrados = dados_filtrados[dados_filtrados['default'] == valor]
     
 
 # mostrar dados
