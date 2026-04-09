@@ -65,11 +65,6 @@ dados_filtrados = dados[
 if default_opcao != 'Todos':
     dados_filtrados = dados_filtrados[dados_filtrados['default'] == valor]
     
-
-# mostrar dados
-st.subheader('Dados')
-st.write(dados_filtrados.head())
-
 # métricas
 st.subheader('Métricas')
 col1, col2 = st.columns(2)
@@ -96,7 +91,7 @@ with col1:
     st.pyplot(fig)
 
 with col2:
-    st.subheader('Distribuição de Default')
+    st.subheader('Distribuição de Confiáveis (0) vs Não confiáveis (1)')
     fig, ax = plt.subplots()
     dados_filtrados['default'].value_counts().plot(kind='pie', autopct='%1.1f%%', ax=ax)
     ax.set_ylabel('')
@@ -113,7 +108,7 @@ col1, col2 = st.columns(2)
 with col1:
     fig, ax = plt.subplots()
     sns.histplot(data=dados_filtrados, x='employ', bins=30, kde=True, ax=ax)
-    ax.set_title('Work Experience')
+    ax.set_title('Experiência de Trabalho')
     st.pyplot(fig)
 
 with col2:
@@ -146,8 +141,8 @@ with col1:
 
 with col2:
     fig, ax = plt.subplots()
-    sns.histplot(data=dados_filtrados, x='address', bins=30, kde=True, ax=ax)
-    ax.set_title('Endereço')
+    sns.histplot(data=dados, x='address', bins=30, kde=True)
+    ax.set_title('Tempo (em anos) que a pessoa mora no mesmo endereço')
     st.pyplot(fig)
 
 # educação (inteiros)
