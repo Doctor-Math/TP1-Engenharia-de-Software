@@ -8,7 +8,7 @@ import matplotlib.ticker as ticker
 st.title('📊 Dashboard de Análise de Crédito')
 
 # carregar dados
-dados = pd.read_csv('bankloans.csv')
+dados = pd.read_csv('../data/bankloans.csv')
 
 # sidebar (filtros)
 st.sidebar.header('Filtros')
