@@ -115,7 +115,7 @@ sequenceDiagram
 ## 🛠️ Pilha de Tecnologias
 
 ### 💻 Ambiente e Hardware
-- **Plataforma:** Google Colab
+- **Plataforma:** Google Colab e Visual Code Studio
 - **Aceleração de Hardware:** CPU e GPU (NVIDIA T4) para processamento paralelo, conforme necessidade.
 - **Memória RAM:** Instância padrão de ~12GB.
 
