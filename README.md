@@ -16,6 +16,46 @@ As principais features (variáveis) a serem exploradas são:
 * **Tamanho:** 1.150 instâncias / 42,07kB
 * **Quantidade de Features:** 9 variáveis, incluindo dados socioeconômicos, demográficos e histórico financeiro, a saber: *age* (idade), *ed* (escolaridade), *employ* (experiência profissional), *address* (endereço), *income* (renda), *debtinc* (índice de endividamento), *creddebt* (relação crédito/dívida), *othdebt* (outras dívidas) e *default* (variável binária, indicando se o cliente já foi inadimplente no passado).
 
+### Diagramas UML 
+
+## De Classes (Estático)
+
+```mermaid
+classDiagram
+    class BankLoanPipeline {
+        +process(df)
+        +check_bias(features)
+    }
+    class DataExplorer {
+        +generate_eda_stats()
+        +plot_distributions()
+    }
+    class ModelManager {
+        -pipeline
+        -model
+        +run_prediction(raw_data)
+        +compare_models(model_list)
+    }
+    class BaseModel {
+        <<abstract>>
+        +train(X, y)
+        +predict(X)
+    }
+    class ClassifierModel {
+        +evaluate()
+        +get_feature_importance()
+    }
+    class ClusterModel {
+        +get_segments()
+    }
+
+    ModelManager --> BankLoanPipeline
+    ModelManager --> BaseModel
+    BaseModel <|-- ClassifierModel
+    BaseModel <|-- ClusterModel
+```
+
+
 ## 👥 Membros da Equipe e Papéis
 * **[Anny Caroline Almida Marcelino](https://github.com/AnnyACAM)**
   * **Papel:** *Machine Learning Engineer / Cientista de Dados*
