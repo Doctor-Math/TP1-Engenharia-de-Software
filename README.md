@@ -16,6 +16,85 @@ As principais features (variáveis) a serem exploradas são:
 * **Tamanho:** 1.150 instâncias / 42,07kB
 * **Quantidade de Features:** 9 variáveis, incluindo dados socioeconômicos, demográficos e histórico financeiro, a saber: *age* (idade), *ed* (escolaridade), *employ* (experiência profissional), *address* (endereço), *income* (renda), *debtinc* (índice de endividamento), *creddebt* (relação crédito/dívida), *othdebt* (outras dívidas) e *default* (variável binária, indicando se o cliente já foi inadimplente no passado).
 
+## Diagramas UML 
+
+### De Classes (Estático)
+
+```mermaid
+classDiagram
+    class BankLoanPipeline {
+        +process(df)
+        +check_bias(features)
+    }
+    class DataExplorer {
+        +generate_eda_stats()
+        +plot_distributions()
+    }
+    class ModelManager {
+        -pipeline
+        -model
+        +run_prediction(raw_data)
+        +compare_models(model_list)
+    }
+    class BaseModel {
+        <<abstract>>
+        +train(X, y)
+        +predict(X)
+    }
+    class ClassifierModel {
+        +evaluate()
+        +get_feature_importance()
+    }
+    class ClusterModel {
+        +get_segments()
+    }
+
+    ModelManager --> BankLoanPipeline
+    ModelManager --> BaseModel
+    BaseModel <|-- ClassifierModel
+    BaseModel <|-- ClusterModel
+```
+
+### De Sequência (Aprovação de um Novo Cliente)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant U as Usuário (Streamlit)
+    participant M as ModelManager
+    participant P as BankLoanPipeline
+    participant S as ClusterModel (Segmenter)
+    participant C as ClassifierModel (Identifier)
+
+    U->>M: run_prediction(dados_brutos_cliente)
+    
+    activate M
+    M->>P: process(dados_brutos, training=False)
+    activate P
+    P->>P: _validate_data()
+    P->>P: _engineer_features()
+    P-->>M: dados_preparados (X_scaled)
+    deactivate P
+
+    rect rgb(240, 240, 240)
+        Note over M, S: Etapa de Perfilamento (Opcional)
+        M->>S: get_segments(dados_preparados)
+        S-->>M: perfil_cluster (ex: "Alta Renda/Risco Médio")
+    end
+
+    M->>C: predict(dados_preparados)
+    activate C
+    C-->>M: resultado (0 ou 1)
+    deactivate C
+
+    M-->>U: Retorna Status e Perfil do Cliente
+    deactivate M
+    
+    Note right of U: Interface exibe: "Aprovado!"
+```
+
+
+
 ## 👥 Membros da Equipe e Papéis
 * **[Anny Caroline Almida Marcelino](https://github.com/AnnyACAM)**
   * **Papel:** *Machine Learning Engineer / Cientista de Dados*
@@ -36,7 +115,7 @@ As principais features (variáveis) a serem exploradas são:
 ## 🛠️ Pilha de Tecnologias
 
 ### 💻 Ambiente e Hardware
-- **Plataforma:** Google Colab
+- **Plataforma:** Google Colab e Visual Code Studio
 - **Aceleração de Hardware:** CPU e GPU (NVIDIA T4) para processamento paralelo, conforme necessidade.
 - **Memória RAM:** Instância padrão de ~12GB.
 

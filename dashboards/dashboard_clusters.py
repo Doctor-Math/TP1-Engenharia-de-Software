@@ -18,7 +18,7 @@ st.title("Dashboard de Segmentação de Clientes")
 # =========================
 # UPLOAD
 # =========================
-file = "bankloans.csv"
+file = "../data/bankloans.csv"
 
 df = pd.read_csv(file)
 df = df.dropna()
