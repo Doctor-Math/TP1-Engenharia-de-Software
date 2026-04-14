@@ -18,7 +18,7 @@ st.title("Dashboard de Segmentação de Clientes")
 # =========================
 # UPLOAD
 # =========================
-file = "../data/bankloans.csv"
+file = "https://raw.githubusercontent.com/Doctor-Math/TP1-Engenharia-de-Software/main/data/bankloans.csv"
 
 df = pd.read_csv(file)
 df = df.dropna()
