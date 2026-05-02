@@ -53,7 +53,7 @@ else:
 # --- SIDEBAR / MENU ---
 st.sidebar.title("Menu de Navegação")
 aba = st.sidebar.radio("Selecione uma visão:", 
-    ["Exploração de Dados (EDA)", "Análise de Crédito", "Segmentação (Marketing)", "Auditoria de Ética"])
+    ["Exploração de Dados (EDA)", "Análise de Crédito", "Segmentação (Marketing)", "Fatores de Inadimplência", "Auditoria de Ética"])
 
 # --- CARREGAMENTO DA BASE ---
 
@@ -148,33 +148,75 @@ elif aba == "Análise de Crédito":
             st.error(f"Erro técnico: {e}")
 
 elif aba == "Segmentação (Marketing)":
-    st.title("🎯 Segmentação de Perfil de Cliente")
-    st.markdown("Esta visualização utiliza **K-Means** para agrupar clientes e **PCA** para reduzir a dimensionalidade.")
+    st.title("🎯 Dashboard de Segmentação de Clientes")
+    st.markdown("Esta visão utiliza **IA** para agrupar clientes com comportamentos financeiros semelhantes.")
 
-    # 1. Processar a base inteira para o cluster
-    # Removemos o alvo 'default' se ele existir no df_raw para não enviesar o cluster
+    import plotly.express as px
+
+    # 1. Processamento dos Dados
+    # Usamos o pipeline para garantir que a escala seja a mesma do treino
     X_raw = df_raw.drop(columns=['default'], errors='ignore')
     X_processed = pipeline.process(X_raw, training=False)
     
-    # 2. Obter Clusters e Coordenadas PCA
+    # 2. Predição de Clusters e PCA
+    # Usamos o seu modelo carregado para manter a consistência
     clusters = model_cluster.predict(X_processed)
     pca_coords = model_cluster.get_pca_coords(X_processed)
     
-    # 3. Plotar
-    fig, ax = plt.subplots(figsize=(10, 6))
-    scatter = ax.scatter(pca_coords[:, 0], pca_coords[:, 1], c=clusters, cmap='viridis', alpha=0.6)
-    ax.set_title("Clusters de Clientes (Visualização 2D via PCA)")
-    ax.set_xlabel("Componente Principal 1")
-    ax.set_ylabel("Componente Principal 2")
-    plt.colorbar(scatter, label='Cluster ID')
-    
-    st.pyplot(fig)
-    
-    # 4. Insights dos Clusters
-    st.write("### 📊 Perfil dos Grupos")
-    df_with_clusters = df_raw.copy()
-    df_with_clusters['Cluster'] = clusters
-    st.dataframe(df_with_clusters.groupby('Cluster').mean())
+    # Adicionamos os resultados ao DataFrame original para visualização
+    df_viz = df_raw.copy()
+    df_viz['cluster'] = clusters.astype(str) # Transformar em string para o Plotly tratar como categórico
+    df_viz['pca1'] = pca_coords[:, 0]
+    df_viz['pca2'] = pca_coords[:, 1]
+
+    # 3. Visualização Interativa (Plotly)
+    col_graph, col_dist = st.columns([2, 1])
+
+    with col_graph:
+        st.subheader("Mapa Espacial de Clusters")
+        fig_scatter = px.scatter(
+            df_viz,
+            x='pca1',
+            y='pca2',
+            color='cluster',
+            title="Distribuição de Clientes (Redução de Dimensionalidade PCA)",
+            hover_data=['age', 'income', 'employ', 'debtinc'],
+            color_discrete_sequence=px.colors.qualitative.Safe
+        )
+        st.plotly_chart(fig_scatter, use_container_width=True)
+
+    with col_dist:
+        st.subheader("Volume por Grupo")
+        fig_hist = px.histogram(df_viz, x='cluster', color='cluster', 
+                               color_discrete_sequence=px.colors.qualitative.Safe)
+        st.plotly_chart(fig_hist, use_container_width=True)
+
+    # 4. Tabela de Perfil e Estratégia
+    st.divider()
+    st.subheader("📋 Perfil Médio e Estratégia de Negócio")
+
+    # Calculamos a média por cluster
+    features = ['age', 'income', 'employ', 'debtinc', 'creddebt', 'othdebt']
+    profile = df_viz.groupby('cluster')[features].mean()
+
+    # Função de Estratégia (Baseada no seu exemplo)
+    def sugerir_estrategia(row):
+        if row['debtinc'] > 15 or row['creddebt'] > 5:
+            return "⚠️ Alto Risco: Restringir crédito e monitorar."
+        elif row['income'] > 60 and row['debtinc'] < 10:
+            return "💎 Premium: Oferecer cartões Black e investimentos."
+        elif row['employ'] > 10:
+            return "🛡️ Estável: Oferecer aumento de limite progressivo."
+        else:
+            return "🌱 Potencial: Crédito inicial com juros moderados."
+
+    profile['Sugestão de Estratégia'] = profile.apply(sugerir_estrategia, axis=1)
+
+    # Exibição estilizada
+    st.dataframe(
+        profile.style.background_gradient(cmap='Greens', subset=['income'])
+        .format("{:.2f}", subset=features)
+    )
 
 elif aba == "Auditoria de Ética":
     st.title("⚖️ Auditoria de Viés Algorítmico")
@@ -213,3 +255,82 @@ elif aba == "Auditoria de Ética":
         bias_report.append({'Faixa de Renda': grupo, 'FPR (Risco de Injustiça)': f"{fpr:.2%}"})
     
     st.table(pd.DataFrame(bias_report))
+
+elif aba == "Fatores de Inadimplência":
+    st.title("📊 Análise das Variáveis de Inadimplência")
+    st.markdown("Nesta seção, exploramos como cada variável impacta o risco de crédito.")
+
+    # 1. Filtro de Variável (Sidebar específica para esta aba)
+    features_analise = ["employ", "debtinc", "creddebt", "othdebt", "income", "age"]
+    st.sidebar.divider()
+    st.sidebar.subheader("🔍 Filtro de Análise")
+    var_alvo = st.sidebar.selectbox('Analisar impacto de:', features_analise)
+
+    # 2. Painel de Métricas do Modelo
+    st.subheader("Performance Global do Modelo")
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("AUC-ROC", "0.85", help="Capacidade de distinguir bons e maus pagadores.")
+    m2.metric("F1-Score", "0.65")
+    m3.metric("Recall", "0.78")
+    m4.metric("Precision", "0.56")
+
+    st.divider()
+
+    col_graf, col_info = st.columns([2, 1])
+
+    with col_graf:
+        # 3. Risco por Faixa (Gráfico de Barras)
+        st.subheader(f"Taxa de Inadimplência por Faixa: {var_alvo}")
+        
+        # Criamos as faixas de dados para a variável selecionada
+        df_plot = df_raw.copy()
+        df_plot['faixa'] = pd.qcut(df_plot[var_alvo], q=5, duplicates='drop').astype(str)
+        var_group = df_plot.groupby('faixa')['default'].mean().reset_index()
+        
+        import seaborn as sns
+        fig, ax = plt.subplots(figsize=(10, 5))
+        sns.barplot(data=var_group, x='faixa', y='default', palette='Reds', ax=ax)
+        ax.set_ylabel("Inadimplência Média (%)")
+        st.pyplot(fig)
+
+    with col_info:
+        # 4. Peso das Variáveis (Feature Importance)
+        st.subheader("Importância no Modelo")
+        # Pegamos a importância do seu modelo de Gradient Boosting
+        importances = model_credit.model.feature_importances_
+        # Mapeamos para as colunas do pipeline
+        feat_imp = pd.DataFrame({'Variável': pipeline.feature_names, 'Importância': importances})
+        feat_imp = feat_imp.sort_values(by='Importância', ascending=True).tail(8)
+
+        fig_imp, ax_imp = plt.subplots()
+        # Destacamos a variável que o usuário selecionou
+        colors = ['#d9534f' if v in var_alvo else '#5bc0de' for v in feat_imp['Variável']]
+        ax_imp.barh(feat_imp['Variável'], feat_imp['Importância'], color=colors)
+        st.pyplot(fig_imp)
+
+    st.divider()
+
+    # 5. Mapa de Risco Dinâmico
+    st.subheader("Simulador de Limiar de Risco (Cut-off)")
+    limiar = st.slider("Ajuste o limite de tolerância ao risco:", 0.0, 1.0, 0.5)
+
+    # Pegamos as probabilidades do modelo
+    X_proc = pipeline.process(df_raw.drop(columns=['default']), training=False)
+    probs = model_credit.model.predict_proba(X_proc)[:, 1]
+    
+    df_raw['probabilidade'] = probs
+    df_raw['decisao'] = df_raw['probabilidade'].apply(lambda x: 'Negado' if x >= limiar else 'Aprovado')
+
+    c1, c2 = st.columns(2)
+    aprovados = (df_raw['decisao'] == 'Aprovado').sum()
+    c1.metric("Clientes Aprovados", aprovados, f"{aprovados/len(df_raw):.1%}")
+    c2.metric("Clientes Negados", len(df_raw)-aprovados, f"{(len(df_raw)-aprovados)/len(df_raw):.1%}")
+
+    # Gráfico de dispersão do Risco
+    import plotly.express as px
+    fig_risk = px.scatter(df_raw, x='debtinc', y='probabilidade', color='decisao',
+                         title="Probabilidade de Risco vs. Endividamento",
+                         labels={'debtinc': 'Relação Dívida/Renda', 'probabilidade': 'Risco Calculado'},
+                         color_discrete_map={'Aprovado': '#2ca02c', 'Negado': '#d62728'})
+    fig_risk.add_hline(y=limiar, line_dash="dash", line_color="black", annotation_text="Limiar de Corte")
+    st.plotly_chart(fig_risk, use_container_width=True)

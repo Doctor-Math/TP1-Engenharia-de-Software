@@ -11,7 +11,7 @@ st.title('Análise Variáveis de Inadimplência')
 #----------------------------
 # CARREGA DADOS
 # ----------------------------
-url = 'https://raw.githubusercontent.com/Doctor-Math/TP1-Engenharia-de-Software/main/data/bankloans.csv'
+url = 'https://raw.githubusercontent.com/Doctor-Math/TP1-Engenharia-de-Software/main/credit_system/data/bankloans.csv'
 dados = pd.read_csv(url).dropna()
 dados = pd.get_dummies(dados, columns=['ed'], prefix='edu_level')
 features = ["employ", "address", "debtinc", "creddebt", "edu_level_2"] # variaveis que estimam o modelo
