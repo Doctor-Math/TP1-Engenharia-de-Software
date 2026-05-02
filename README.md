@@ -171,7 +171,7 @@ stateDiagram-v2
 
 ## 👥 Membros da Equipe e Papéis
 * **[Anny Caroline Almida Marcelino](https://github.com/AnnyACAM)**
-  * **Papel:** *Machine Learning Engineer / Cientista de Dados*
+  * **Papel:** *Cientista de Dados*
   * **Responsabilidades:** Lidera a inteligência preditiva. Responsável pela seleção de algoritmos, divisão de dados (treino/teste), ajuste de hiperparâmetros e validação do modelo através de métricas como Acurácia, F1-Score e AUC-ROC.
 
 * **[Carolina Penido Barcellos](https://github.com/carolinabarcellos)**
@@ -179,11 +179,11 @@ stateDiagram-v2
   * **Responsabilidades:** Atua na ponte entre dados e decisão. Responsável pela criação de visualizações críticas, interpretação estatística dos resultados e tradução dos outputs do modelo em insights estratégicos de negócio.
 
 * **[Gabrielly Xavier dos Santos](https://github.com/gabyxsantos)**
-  * **Papel:** *Cientista de Dados / Analista Exploratória*
+  * **Papel:** *Cientista de Dados*
   * **Responsabilidades:** Focada na compreensão e preparação. Realiza a Análise Exploratória de Dados (EDA) para identificar correlações, trata *outliers* e conduz a Engenharia de Atributos (*Feature Engineering*).
 
 * **[Matheus Soares dos Santos de Freitas](https://github.com/Doctor-Math)**
-  * **Papel:** *Engenheiro de Dados / Arquiteto de Dados*
+  * **Papel:** *Engenheiro de Dados / de Machine Learning*
   * **Responsabilidades:** Garante a infraestrutura e qualidade. Responsável pelo pipeline de limpeza, tratamento de valores nulos (NaN), garantia da tipagem correta e estruturação do dataset final para processamento.
 
 ## 🛠️ Pilha de Tecnologias
