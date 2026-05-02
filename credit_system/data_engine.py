@@ -62,35 +62,32 @@ class BankLoanPipeline:
         return X_bal, y_bal
 
     def process(self, df, training=True):
-        df = self._validate_data(df)
-        df = self._engineer_features(df)
-
-        X = df.drop(self.target, axis=1) if self.target in df.columns else df
-        y = df[self.target] if self.target in df.columns else None
-
-        if training:
-            # 1. Split Estratificado Inicial
-            X_train, X_test, y_train, y_test = train_test_split(
-                X, y, test_size=self.test_size,
-                stratify=y, random_state=self.random_state
-            )
-
-            # 2. Balanceamento (Apenas nos dados de TREINO)
-            if self.balance:
-                X_train, y_train = self._balance_data(X_train, y_train)
-
-            # 3. Escalonamento
-            X_train_scaled = self.scaler.fit_transform(X_train)
-            X_test_scaled = self.scaler.transform(X_test)
+        # 1. Limpeza básica
+        df = df.copy()
+        
+        # 2. One-Hot Encoding da educação
+        if 'ed' in df.columns:
+            df = pd.get_dummies(df, columns=['ed'], prefix='edu_level')
             
-            self.is_fitted = True
-            self.feature_names = X.columns.tolist()
-
-            return X_train_scaled, X_test_scaled, y_train, y_test
+        # Se não estivermos treinando, precisamos garantir que as colunas 
+        # sejam EXATAMENTE as mesmas que o modelo viu no treino.
+        if not training:
+            # Reindex garante que:
+            # - Colunas que faltam (ex: outros níveis de ed) sejam criadas com 0
+            # - Colunas extras sejam removidas
+            # - A ordem das colunas seja idêntica à do treino
+            df = df.reindex(columns=self.feature_names, fill_value=0)
         else:
-            if not self.is_fitted:
-                raise Exception("O pipeline precisa ser treinado antes.")
-            return self.scaler.transform(X)
+            # Se for treino, guardamos a ordem oficial das colunas
+            self.feature_names = df.columns.tolist()
+        # --------------------------
+
+        # 3. Escalonamento
+        if training:
+            return self.scaler.fit_transform(df)
+        else:
+            # Agora o df tem as mesmas colunas que o scaler espera!
+            return self.scaler.transform(df)
 
     def save_pipeline(self, filename='loan_pipeline.joblib'):
         """Salva o objeto inteiro (incluindo o scaler ajustado)."""
