@@ -22,75 +22,149 @@ As principais features (variáveis) a serem exploradas são:
 
 ```mermaid
 classDiagram
+    class App {
+        +load_assets()
+        +aba_simulacao()
+        +aba_marketing()
+        +aba_bi_inadimplencia()
+        +aba_etica()
+    }
+
     class BankLoanPipeline {
-        +process(df)
-        +check_bias(features)
+        +scaler: StandardScaler
+        +feature_names: list
+        +process(df, training)
+        +save_pipeline(path)
+        +load_pipeline(path)
     }
-    class DataExplorer {
-        +generate_eda_stats()
-        +plot_distributions()
-    }
-    class ModelManager {
-        -pipeline
-        -model
-        +run_prediction(raw_data)
-        +compare_models(model_list)
-    }
+
     class BaseModel {
         <<abstract>>
+        +model: sklearn_estimator
         +train(X, y)
         +predict(X)
+        +save(path)
+        +load(path)*
     }
-    class ClassifierModel {
-        +evaluate()
+
+    class GradientBoostingModel {
         +get_feature_importance()
     }
+
     class ClusterModel {
-        +get_segments()
+        +pca: PCA
+        +get_pca_coords(X)
+        +train(X)
     }
 
-    ModelManager --> BankLoanPipeline
-    ModelManager --> BaseModel
-    BaseModel <|-- ClassifierModel
-    BaseModel <|-- ClusterModel
+    class DataExplorer {
+        +df: DataFrame
+        +plot_distribution(var)
+        +get_correlation_matrix()
+    }
+
+    class BiasEvaluator {
+        +calculate_fpr(y_true, y_pred, group)
+    }
+
+    App --> BankLoanPipeline : utiliza
+    App --> BaseModel : utiliza
+    App --> DataExplorer : utiliza
+    App --> BiasEvaluator : utiliza
+    BaseModel <|-- GradientBoostingModel : herança
+    BaseModel <|-- ClusterModel : herança
+    BaseModel <|-- LogisticRegressionModel : herança
 ```
 
-### De Sequência (Aprovação de um Novo Cliente)
+### De Sequência (Dinâmico/Comportalmental)
 
 ```mermaid
 sequenceDiagram
     autonumber
-    participant U as Usuário (Streamlit)
-    participant M as ModelManager
-    participant P as BankLoanPipeline
-    participant S as ClusterModel (Segmenter)
-    participant C as ClassifierModel (Identifier)
+    actor Usuario as Analista de Risco
+    participant UI as Interface Streamlit
+    participant PL as BankLoanPipeline
+    participant MD as GradientBoostingModel
 
-    U->>M: run_prediction(dados_brutos_cliente)
+    Usuario->>UI: Insere dados (Idade, Renda, Dívidas)
+    Usuario->>UI: Clica em "Analisar Crédito"
     
-    activate M
-    M->>P: process(dados_brutos, training=False)
-    activate P
-    P->>P: _validate_data()
-    P->>P: _engineer_features()
-    P-->>M: dados_preparados (X_scaled)
-    deactivate P
+    UI->>PL: process(dados_brutos, training=False)
+    Note over PL: Aplica Dummies e Reindex (Alinhamento)
+    PL-->>UI: Retorna X_processed (12 colunas)
 
-    rect rgb(240, 240, 240)
-        Note over M, S: Etapa de Perfilamento (Opcional)
-        M->>S: get_segments(dados_preparados)
-        S-->>M: perfil_cluster (ex: "Alta Renda/Risco Médio")
+    UI->>MD: predict(X_processed)
+    MD-->>UI: Retorna Predição (0 ou 1)
+
+    alt Sucesso
+        UI-->>Usuario: Exibe "Crédito Aprovado" + Balloons
+    else Risco
+        UI-->>Usuario: Exibe "Crédito Negado" + Warning
     end
 
-    M->>C: predict(dados_preparados)
-    activate C
-    C-->>M: resultado (0 ou 1)
-    deactivate C
+    Note over UI, MD: Fluxo de BI (Aba Inadimplência)
+    Usuario->>UI: Ajusta Limiar de Risco (Slider)
+    UI->>MD: predict_proba(X_proc)
+    MD-->>UI: Retorna Probabilidades
+    UI->>UI: Recalcula Aprovados/Negados dinamicamente
+    UI-->>Usuario: Atualiza Mapa de Risco (Plotly)
+```
 
-    M-->>U: Retorna Status e Perfil do Cliente
-    deactivate M
+### De Atividades (Dinâmico/Comportamental)
+
+```mermaid
+stateDiagram-v2
+    [*] --> IniciarApp
+    IniciarApp --> CarregarRecursos: load_assets()
     
-    Note right of U: Interface exibe: "Aprovado!"
+    state CarregarRecursos {
+        [*] --> VerificarArquivos
+        VerificarArquivos --> CarregarModelos: Arquivos OK
+        VerificarArquivos --> ErroArquivos: Faltando .joblib
+        CarregarModelos --> CarregarCSV
+        CarregarCSV --> ErroCSV: CSV não encontrado
+    }
+
+    ErroArquivos --> [*]: Stop App
+    ErroCSV --> [*]: Stop App
+
+    CarregarCSV --> SelecionarAba: Sucesso
+
+    state SelecionarAba {
+        [*] --> Escolha
+        Escolha --> EDA: "Exploração de Dados"
+        Escolha --> Simulador: "Análise de Crédito"
+        Escolha --> Marketing: "Segmentação"
+        Escolha --> BI: "Fatores de Inadimplência"
+        Escolha --> Etica: "Auditoria"
+    }
+
+    state Simulador {
+        [*] --> PreencherFormulario
+        PreencherFormulario --> ClicarBotao: Submit
+        ClicarBotao --> ProcessarDados: pipeline.process()
+        ProcessarDados --> AlinharColunas: Reindex(fill_value=0)
+        AlinharColunas --> Predicao: model.predict()
+        
+        state Predicao <<choice>>
+        Predicao --> Aprovado: Classe 0
+        Predicao --> Negado: Classe 1
+        
+        Aprovado --> ExibirResultado
+        Negado --> ExibirResultado
+    }
+
+    state BI {
+        [*] --> CalcularProbabilidades
+        CalcularProbabilidades --> AjustarLimiar: Slider
+        AjustarLimiar --> AtualizarGraficos: Plotly
+    }
+
+    EDA --> SelecionarAba
+    ExibirResultado --> SelecionarAba
+    Marketing --> SelecionarAba
+    AtualizarGraficos --> SelecionarAba
+    Etica --> SelecionarAba
 ```
 
 
