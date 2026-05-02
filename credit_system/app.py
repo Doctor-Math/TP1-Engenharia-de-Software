@@ -87,81 +87,78 @@ if aba == "Exploração de Dados (EDA)":
 
 elif aba == "Análise de Crédito":
     st.title("💳 Simulador de Aprovação de Crédito")
-    st.info("Preencha os dados do cliente para obter a predição em tempo real.")
+    
+    # --- FERRAMENTA: AJUSTE DE LIMIAR ---
+    st.sidebar.divider()
+    st.sidebar.subheader("⚙️ Configurações de Risco")
+    limiar_corte = st.sidebar.slider(
+        "Limiar de Aceitação (Cut-off):", 
+        min_value=0.0, max_value=1.0, value=0.50, step=0.05,
+        help="Quanto menor o limiar, mais rígida é a aprovação. Padrão: 0.50"
+    )
+
+    st.info("Preencha os dados do cliente para obter a predição e segmentação em tempo real.")
     
     with st.form("form_cliente"):
         c1, c2, c3 = st.columns(3)
         age = c1.number_input("Idade", 18, 100, 30)
-        # Sugestão: Manter a unidade em dólares inteiros para o usuário e converter no código
         income = c2.number_input("Renda Anual ($)", 0, 1000000, 50000)
         employ = c3.number_input("Anos no emprego atual", 0, 50, 5)
         
         c4, c5, c6 = st.columns(3)
         creddebt = c4.number_input("Dívida de Cartão ($)", 0.0, 100000.0, 1000.0)
         othdebt = c5.number_input("Outras Dívidas ($)", 0.0, 100000.0, 2000.0)
-        ed_level=c6.number_input("Nível educacional (1 a 4):",1,4,1)
+        ed_level = c6.number_input("Nível educacional (1 a 4):", 1, 4, 1)
         
-        # Cálculo Automático do Debt-to-Income Ratio
-        # # Evitamos divisão por zero se a renda for 0
         if income > 0:
-            debtinc_calculado = (creddebt / income) * 100
+            debtinc_calculado = ((creddebt + othdebt) / income) * 100
         else:
             debtinc_calculado = 0.0
             
-        st.write(f"**Razão Dívida/Renda:** {debtinc_calculado:.2f}%")
-        
+        st.write(f"**Razão Dívida/Renda Calculada:** {debtinc_calculado:.2f}%")
         submit = st.form_submit_button("Analisar Crédito")
 
     if submit:
-        # Convertendo para a escala que o modelo 'conhece' (milhares)
-        income_modelo = income / 1000
-        creddebt_modelo = creddebt / 1000
-        othdebt_modelo = othdebt / 1000
-        
-        # O debtinc é uma razão, então 3000/50000 é o mesmo que 3/50.
-        debtinc_final = ((creddebt_modelo + othdebt_modelo) / income_modelo * 100) if income_modelo > 0 else 0
+        # 1. Preparação dos dados (Mesma escala do modelo)
+        income_mod = income / 1000
+        cred_mod = creddebt / 1000
+        oth_mod = othdebt / 1000
+        debtinc_final = ((cred_mod + oth_mod) / income_mod * 100) if income_mod > 0 else 0
         
         dados_usuario = {
-            'age': age,
-            'ed': ed_level,
-            'employ': employ,
-            'address': 5, # Valor fixo ou médio
-            'income': income_modelo,
-            'debtinc': debtinc_final,
-            'creddebt': creddebt_modelo,
-            'othdebt': othdebt_modelo
-    }
+            'age': age, 'ed': ed_level, 'employ': employ, 'address': 5, 
+            'income': income_mod, 'debtinc': debtinc_final, 
+            'creddebt': cred_mod, 'othdebt': oth_mod
+        }
         
         input_data = pd.DataFrame([dados_usuario])
         
         try:
-            # 2. Processar via Pipeline
+            # 2. Processamento
             X_processed = pipeline.process(input_data, training=False)
-            
-            # Transformamos em DataFrame para garantir que todas as colunas do treino existam
-            X_df = pd.DataFrame(X_processed, columns=pipeline.feature_names)
-            
-            # Se faltar alguma coluna (como as de educação), o código abaixo preenche com 0
-            for col in pipeline.feature_names:
-                if col not in X_df.columns:
-                    X_df[col] = 0
-            
-            # Reordenamos para ficar igual ao fit do modelo
+            X_df = pd.DataFrame(X_processed, columns=pipeline.feature_names).fillna(0)
             X_final = X_df[pipeline.feature_names].values
-            # ----------------------
 
-            # 3. Predição usando os dados alinhados
-            pred = model_credit.predict(X_final)
-            
-            st.divider()
-            if pred[0] == 0:
-                st.balloons()
-                st.success("## ✅ Crédito Aprovado!")
+            # --- FERRAMENTA: PREDIÇÃO COM LIMIAR PERSONALIZADO ---
+            # Pegamos a probabilidade da classe 1 (Inadimplente)
+            prob_inadimplencia = model_credit.model.predict_proba(X_final)[0][1]
+
+            st.subheader("🎯 Resultado da Análise")
+            # Se a prob for maior que o limiar escolhido, negamos
+            if prob_inadimplencia >= limiar_corte:
+                st.error(f"### ❌ Crédito Negado")
+                st.write(f"Risco Calculado: **{prob_inadimplencia:.1%}**")
+                st.write(f"Limiar de Corte: **{limiar_corte:.1%}**")
             else:
-                st.error("## ❌ Crédito Negado")
-                
+                st.balloons()
+                st.success(f"### ✅ Crédito Aprovado!")
+                st.write(f"Risco Calculado: **{prob_inadimplencia:.1%}**")
+
+            # Barra visual de risco
+            st.progress(prob_inadimplencia)
+
         except Exception as e:
-            st.error(f"Erro técnico: {e}")
+            st.error(f"Erro técnico na predição: {e}")
 
 elif aba == "Segmentação (Marketing)":
     st.title("🎯 Dashboard de Segmentação de Clientes")
